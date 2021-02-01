@@ -12,51 +12,19 @@ import {
 } from "@temp/core/utils";
 import { IFilters } from "@types";
 import { FilterQuerySet, SORT_OPTIONS } from "@utils/collections";
-import { UknownObject } from "@utils/tsUtils";
 
 import { MetaWrapper, NotFound } from "../../components";
 import NetworkStatus from "../../components/NetworkStatus";
 import { PRODUCTS_PER_PAGE } from "../../core/config";
 import { CategoryData, Page } from "./Page";
-
-const handleFiltersChange = (
-  filters: IFilters,
-  attributeFilters: UknownObject<string[]>,
-  setAttributeFilters: (newValue: UknownObject<string[]>) => void
-) => (name: string, value: string) => {
-  if (attributeFilters && attributeFilters.hasOwnProperty(name)) {
-    if (attributeFilters[name].includes(value)) {
-      if (filters.attributes[`${name}`].length === 1) {
-        const att = { ...attributeFilters };
-        delete att[`${name}`];
-        setAttributeFilters({
-          ...att,
-        });
-      } else {
-        setAttributeFilters({
-          ...attributeFilters,
-          [`${name}`]: attributeFilters[`${name}`].filter(
-            item => item !== value
-          ),
-        });
-      }
-    } else {
-      setAttributeFilters({
-        ...attributeFilters,
-        [`${name}`]: [...attributeFilters[`${name}`], value],
-      });
-    }
-  } else {
-    setAttributeFilters({ ...attributeFilters, [`${name}`]: [value] });
-  }
-};
+import { handleFiltersChange } from "./utils";
 
 export type CategoryPageProps = {
   params: { slug: string } | undefined;
   data: ({ id: string } & CategoryData) | undefined | null;
 };
 
-export const CategoryPage: NextPage<CategoryPageProps> = ({ params, data }) => {
+export const CategoryPage: NextPage<CategoryPageProps> = ({ data }) => {
   const { products: ssrProducts, ...category } = data;
   const [sort, setSort] = useQueryParam("sortBy", StringParam);
   const [attributeFilters, setAttributeFilters] = useQueryParam(
